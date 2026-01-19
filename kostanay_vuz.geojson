@@ -1,0 +1,18 @@
+{
+"type": "FeatureCollection",
+"name": "kostanay_vuz",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Adress": "просп. Абая, 11", "sobstvennik": "Костанайская академия Министерства внутренних дел Республики Казахстан имени Шракбека Кабылбаева" }, "geometry": { "type": "Point", "coordinates": [ 63.597441624179275, 53.175726622905998 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Тарана 118, Пушкина 133, уч. 703", "sobstvennik": "Kostanay State Pedagogical Institute" }, "geometry": { "type": "Point", "coordinates": [ 63.626352200500591, 53.220952168309168 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Герцена д. 27", "sobstvennik": "Костанайский Социально Технический Университет" }, "geometry": { "type": "Point", "coordinates": [ 63.678411623514094, 53.245032015629242 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Байтурсынова 47 и Толстого 66, уч. 941", "sobstvennik": "Костанайский государственный университет им. А. Байтурсынова" }, "geometry": { "type": "Point", "coordinates": [ 63.628337876187565, 53.213845863372349 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Герцена д. 27", "sobstvennik": "Костанайский Социально Технический Университет технический корпус" }, "geometry": { "type": "Point", "coordinates": [ 63.680013643701095, 53.246204257546694 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Пушкина д. 179", "sobstvennik": "Бывшее здание Бизнес-колледжа (Заброшено)" }, "geometry": { "type": "Point", "coordinates": [ 63.619508828768737, 53.224827169951219 ] } },
+{ "type": "Feature", "properties": { "Adress": "0", "sobstvennik": "Факультет ветеринарии и технологии животноводства КГУ" }, "geometry": { "type": "Point", "coordinates": [ 63.620184756702372, 53.186171455728228 ] } },
+{ "type": "Feature", "properties": { "Adress": "просп. Кобыланды Батыра, 29", "sobstvennik": "" }, "geometry": { "type": "Point", "coordinates": [ 63.679122997110973, 53.24549560601131 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Бородина д. 168 \"А\"", "sobstvennik": "Челябинский Государственный Университет,филиал" }, "geometry": { "type": "Point", "coordinates": [ 63.636764910142908, 53.232200758243586 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Бородина уч. № 168 \"А\"", "sobstvennik": "" }, "geometry": { "type": "Point", "coordinates": [ 63.636091718388386, 53.231882487083041 ] } },
+{ "type": "Feature", "properties": { "Adress": "просп. Аль-Фараби уч. 99", "sobstvennik": "" }, "geometry": { "type": "Point", "coordinates": [ 63.625909887897464, 53.217042307480362 ] } }
+]
+}

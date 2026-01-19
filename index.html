@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Костанай – Казахстанская жилищная компания</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" />
+
+<style>
+    html,body{margin:0;padding:0;height:100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+    #map{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;background:#f8f9fa}
+    
+    /* --- Кнопки справа --- */
+    /* 1. Ссылка на внешнюю карту */
+    .external-link-btn {
+        position: absolute; top: 20px; right: 20px; z-index: 1000;
+        background: #ffffff; padding: 10px 16px; border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-decoration: none;
+        color: #1e293b; font-size: 13px; font-weight: 700; border: 1px solid #e2e8f0;
+        transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+    }
+    .external-link-btn:hover { background: #f8fafc; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); color: #2563eb; }
+
+    /* 2. Переключатель подложки (кастомный) */
+    .basemap-switcher {
+        position: absolute; top: 70px; right: 20px; z-index: 1000;
+        background: white; padding: 4px; border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; gap: 4px;
+        border: 1px solid #e2e8f0;
+    }
+    .basemap-btn {
+        border: none; background: transparent; padding: 6px 12px;
+        border-radius: 6px; font-size: 12px; font-weight: 600; color: #64748b;
+        cursor: pointer; transition: all 0.2s;
+    }
+    .basemap-btn:hover { background: #f1f5f9; color: #333; }
+    .basemap-btn.active { background: #eff6ff; color: #2563eb; font-weight: 700; box-shadow: inset 0 0 0 1px #bfdbfe; }
+
+    /* --- Рубрикатор слева --- */
+    .metrics-control-left{
+        position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.98);
+        padding:15px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12);
+        z-index:1000; display:flex;flex-direction:column; gap:8px; width:250px;
+        backdrop-filter: blur(10px); max-height: 85vh; overflow-y: auto;
+    }
+    
+    details { margin-bottom: 0; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
+    details:last-child { border-bottom: none; }
+    summary { 
+        font-size: 10px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;
+        cursor: pointer; padding: 8px 0; list-style: none; display: flex; justify-content: space-between; align-items: center;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 16px; color: #94a3b8; font-weight: 400; }
+    details[open] summary::after { content: '−'; }
+
+    .metrics-group { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; padding-left: 5px;}
+
+    .metrics-control-left button.metric-btn{
+        padding:6px 10px; background:transparent; border:1px solid transparent; border-radius:6px;
+        cursor:pointer; font-size:11px; text-align:left; transition:all .2s; width: 100%; color: #475569;
+    }
+    .metrics-control-left button.metric-btn:hover{ background:#f8fafc; color: #0f172a; }
+    .metrics-control-left button.metric-btn.active{
+        background:#eff6ff; color:#2563eb; border-color:#dbeafe; font-weight: 600;
+    }
+
+    /* Описание */
+.description-panel {
+    position: absolute; bottom: 30px; left: 20px; width: 400px;
+    background: rgba(255, 255, 255, 0.98); padding: 12px 15px; border-radius: 12px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.15); z-index: 999; 
+    font-size: 12px; border-left: 4px solid #3b82f6; display: none;
+}
+
+.desc-header {
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+}
+
+#descText {
+    margin-top: 10px; display: none; /* Скрыто по умолчанию */
+    border-top: 1px solid #f1f5f9; padding-top: 8px; color: #64748b;
+}
+
+.toggle-icon {
+    font-size: 12px; font-weight: bold; color: #3b82f6;
+    transition: transform 0.3s;
+}
+
+.toggle-icon.active { transform: rotate(180deg); }
+
+    /* Панель маршрутов */
+    #routes-panel {
+        display: none; flex-wrap: wrap; gap: 4px; margin-top: 5px; padding: 5px;
+        background: #f8fafc; border-radius: 6px; border: 1px solid #f1f5f9;
+    }
+    .route-select-btn {
+        padding: 4px 8px; font-size: 11px; font-weight: 600; border: 1px solid #e2e8f0;
+        background: white; color: #64748b; border-radius: 4px; cursor: pointer; flex: 1 0 auto; text-align: center;
+    }
+    .route-select-btn.active { background: #3b82f6; color: white; border-color: #2563eb; }
+
+    /* Панель диаграмм - ФИКСИРОВАННАЯ */
+    .chart-panel {
+        position: absolute; top: 130px; right: 20px; /* Сдвинул ниже переключателя */
+        background: white; padding: 15px; border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1); z-index: 1000;
+        width: 260px; display: none;
+        transition: none !important; animation: none !important;
+    }
+    .chart-panel h4 { margin: 0 0 10px 0; font-size: 13px; color: #333; text-align: center; font-weight: 700;}
+    
+    .chart-container { position: relative; height: 200px; width: 100%; }
+
+    /* Легенда */
+    .legend{
+        position:absolute; bottom:30px; right:20px; background:white; padding:15px; border-radius:12px;
+        box-shadow:0 4px 20px rgba(0,0,0,.1); font-size:12px; width:220px; z-index:999;
+    }
+    .legend-title{ margin-bottom:12px; font-size:13px; color:#1e293b; font-weight: 700; }
+    
+    /* Слайдер */
+    #slider-container { margin-top: 25px; margin-bottom: 10px; padding: 0 5px; }
+    .noUi-connect { background: #3b82f6; }
+    .noUi-handle { height: 18px; width: 18px; top: -7px; right: -9px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: grab;}
+    .legend-labels { display: flex; justify-content: space-between; margin-top: 5px; color: #64748b; font-size: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+    .legend-color { width: 16px; height: 16px; border-radius: 4px; }
+
+    /* --- ПОПАПЫ (Улучшенный стиль) --- */
+    .leaflet-popup-content-wrapper { 
+        border-radius:10px !important; 
+        box-shadow:0 15px 40px rgba(0,0,0,0.25)!important; 
+        padding: 0 !important; overflow: hidden; 
+    }
+    .leaflet-popup-content { 
+        margin: 0 !important; 
+        min-width: 320px !important; /* Сделали шире */
+        max-width: 360px !important;
+    }
+    .popup-header { 
+        background: linear-gradient(135deg, #2563eb, #1d4ed8); 
+        color: white; 
+        padding: 12px 16px; 
+        font-size: 15px; /* Заголовок чуть крупнее */
+        font-weight: 700; 
+        line-height: 1.4;
+    }
+    .popup-body { 
+        padding: 0; 
+        max-height: 320px; 
+        overflow-y: auto; 
+        background: #fff;
+    }
+    .popup-table { width: 100%; border-collapse: collapse; }
+    .popup-table tr { border-bottom: 1px solid #f1f5f9; transition: background 0.1s; }
+    .popup-table tr:last-child { border-bottom: none; }
+    .popup-table tr:hover { background: #f8fafc; }
+    .popup-table td { padding: 8px 16px; font-size: 13px; line-height: 1.4; }
+    .popup-key { color: #64748b; width: 40%; font-weight: 500; }
+    .popup-val { color: #0f172a; font-weight: 600; text-align: right; word-break: break-word; }
+    
+    /* Скрываем стандартный контрол слоев Leaflet, так как у нас свой */
+    .leaflet-control-layers { display: none !important; }
+
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<a href="https://d05s4d1lbkwrkaccszekofu4-xe7ldl-7beih.github.io/kaz4-g2U1mXCZtrademap/" target="_blank" class="external-link-btn">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"></path></svg>
+    Карта Казахстана
+</a>
+
+<div class="basemap-switcher">
+    <button class="basemap-btn active" id="btn-scheme" onclick="setBasemap('scheme')">Схема</button>
+    <button class="basemap-btn" id="btn-sat" onclick="setBasemap('sat')">Спутник</button>
+</div>
+
+<div class="description-panel" id="descPanel">
+    <div class="desc-header" onclick="toggleDescription()">
+        <span class="desc-title" id="descTitle" style="margin-bottom:0; font-size:13px;">Заголовок</span>
+        <span class="toggle-icon" id="descToggleBtn">▼</span>
+    </div>
+    <div id="descText">Текст описания...</div>
+</div>
+
+<div class="chart-panel" id="chartPanel">
+    <h4 id="chartTitle">Статистика</h4>
+    <div class="chart-container">
+        <canvas id="infoChart"></canvas>
+    </div>
+</div>
+
+<div class="metrics-control-left" id="accordion">
+    
+<details>
+    <summary>1. Общий раздел</summary>
+        <div class="metrics-group">
+            <button class="metric-btn active" data-type="cadastre" data-metric="cadastre">Земельные участки</button>
+        </div>
+    </details>
+
+    <details>
+        <summary>2. Политико-правовой</summary>
+        <div class="metrics-group">
+            <button class="metric-btn" data-type="districts" data-metric="crime_density">Плотность правонарушений</button>
+            <button class="metric-btn" data-type="heat_crime" data-metric="crime_heat">Тепловая карта преступлений</button>
+        </div>
+    </details>
+
+    <details>
+        <summary>3. Финансы и Экономика</summary>
+        <div class="metrics-group">
+            <button class="metric-btn" data-type="heat" data-metric="commercial">Коммерческая активность</button>
+            <button class="metric-btn" data-type="districts" data-metric="real_estate">Недвижимость</button>
+        </div>
+    </details>
+
+    <details>
+        <summary>4. Инфраструктура</summary>
+        <div class="metrics-group">
+            <button class="metric-btn" data-type="builds" data-metric="level">Этажность зданий</button>
+            <button class="metric-btn" data-type="builds" data-metric="year">Год постройки</button>
+            <button class="metric-btn" data-type="districts" data-metric="density_gsi">Плотность застройки (GSI)</button>
+            <button class="metric-btn" data-type="rm" data-metric="rm">Реновация и модернизация</button>
+            <button class="metric-btn" data-type="districts" data-metric="density_rds">Плотность УДС</button>
+            <button class="metric-btn" data-type="transport" data-metric="transport">Общественный транспорт</button>
+            <div id="routes-panel"></div>
+        </div>
+    </details>
+
+    <details>
+        <summary>5. Экология и С/Х</summary>
+        <div class="metrics-group">
+            <button class="metric-btn" disabled style="opacity:0.5; cursor: default;">Данные в разработке</button>
+        </div>
+    </details>
+
+    <details>
+        <summary>6. Социальный раздел</summary>
+        <div class="metrics-group">
+            <button class="metric-btn" data-type="districts" data-metric="density_popul">Плотность населения</button>
+            <button class="metric-btn" data-type="social" data-metric="schools">Школы</button>
+            <button class="metric-btn" data-type="social" data-metric="detsad">Детские сады</button>
+            <button class="metric-btn" data-type="social" data-metric="medical">Медицинские объекты</button>
+            <button class="metric-btn" data-type="social" data-metric="college">Колледжи</button>
+            <button class="metric-btn" data-type="social" data-metric="vuz">ВУЗы</button>
+        </div>
+    </details>
+    
+     <details>
+        <summary>7. Культура и Туризм</summary>
+        <div class="metrics-group">
+            <button class="metric-btn" disabled style="opacity:0.5; cursor: default;">Данные в разработке</button>
+        </div>
+    </details>
+
+</div>
+
+<div class="legend" id="legend"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+
+<script>
+// --- Данные для диаграмм ---
+const chartDataSources = {
+    land: {
+        labels: ["Инфраструктура", "Пром. и произв.", "Жилая застройка", "Садоводство", "Прочее"],
+        values: [7920, 5746, 1634, 1541, 1518],
+        colors: ['#64748b', '#94a3b8', '#3b82f6', '#10b981', '#cbd5e1']
+    },
+    crime: {
+        labels: ["Кража", "Мошенничество", "Мелкое хищение", "Наркотики", "Причинение вреда"],
+        values: [4701, 4025, 716, 480, 423],
+        colors: ['#ef4444', '#f87171', '#fca5a5', '#fecaca', '#fee2e2']
+    }
+};
+
+// --- Текстовые описания ---
+const descriptions = {
+    level: "Большая часть городской территории занята домами 1–5 этажей (светло-розовые  и розовые участки). Высотки (от 12 этажей) — редкость и находятся только в ограниченных зонах, вероятно, вблизи ключевых транспортных узлов или административных центров.",
+    year: "Центр города сформирован преимущественно зданиями советских лет (1957–1984) - это самый старый жилой фонд, который задает историческое и культурное ядро города. Спальные районы располагаются на северо - востоке и юго - западе. Эти кварталы появились волнами - от более ранних до позднесоветских и постсоветских застроек, что хорошо заметно по смене оттенков на карте. Здесь преобладает массовое жилищное строительство, рассчитанное на большие группы населения. Современный район на севере — самый новый и быстрорастущий, представлен крупными кварталами новостроек последних десятилетий. Это свидетельствует о смещении градостроительных акцентов и о развитии новых жилых массивов на свободных территориях",
+    cadastre: "На долю инфраструктурных объектов (дороги, коммуникации, ЛЭП) приходится 38.3% площади, а на промышленные и производственные зоны — 27.8%. Вместе эти две категории составляют две трети всего земельного фонда, что характеризует территорию как значимый промышленный и логистический узел. При этом земли, непосредственно используемые населением для жизни и досуга, такие как жилая застройка (7.9%), парковые территории и садоводство (7.5%) и коммерция (6.0%), занимают значительно меньшую долю общей площади, что говорит о более интенсивном и концентрированном характере их использования.",
+    density_popul: "Частный сектор между многоэтажными районами создает разрывы и препятствия в городской структуре. ИЖС сдерживает уплотнение и развитие центра, снижая эффективность использования дорогой городской земли. Для устойчивого городского развития такие разрывы нуждаются в реновации: можно создавать парки с общественной функцией, строить новые жилые или коммерческие здания, организовывать общественные пространства, которые бы «сшивали» ткани города и повышали человеческую активность на этих участках.",
+    density_gsi: "Для города характерна сильная неоднородность по площади застройки разных участков. Высокий GSI не всегда означает интенсивную городскую жизнь: часто это промзоны или склады. Самые “жизненно насыщенные” участки — там, где высокий GSI совпадает с высокой плотностью населения и этажностью зданий. Видны участки для реновации, “разрывы” городской ткани, а также перспективные направления для рационального уплотнения городской структуры. Карта отлично подходит для начального анализа потенциала развития и выявления зон, требующих улучшения или комплексной реконструкции.",
+    density_rds: "Улично-дорожная сеть в целом отражает этапность и специфику развития города: хорошую структуру в центре, достаточно рациональная сетка и новые районы с тенденцией к фрагментации и малой связанности. Ключевые проблемы: 1. Часть старых районов страдает от устаревшей инфраструктуры, которая не соответствует современным транспортным потокам. 2. Новые кварталы часто имеют слабую интеграцию с остальным городом, а транспортная сетка выполнена формально, что снижает связанность городской среды. 3. В промышленной периферии и транзитных зонах УДС становится барьером для пешеходов и городского развития.",
+    transport: "Сеть общественного транспорта достаточно развита по основным магистралям и обеспечивает связность между крупными районами города, но слабо обрабатывает внутренние связи и окраины. 1. Жителям многих районов сложно пользоваться ОТ без лишних пересадок. 2. Текущая структура снижает транспортную гибкость и - на перспективу - требует развития локальных маршрутов, улучшения проникновения в глубокие и новые жилые массивы, а также интеграции с другими видами городской мобильности (пешие, велосипедные связи). 3 .Особое внимание стоит уделить развивающимся новым районам и зонам разрывов городской ткани, чтобы не допустить транспортной изоляции отдельных кварталов",
+    crime_density: "Криминальная активность в городе наиболее выражена в наиболее насыщенных и транзитных районах - центр, крупные жилые массивы и ключевые транспортные коридоры. Малонаселенные и периферийные зоны остаются относительно спокойными. Это типичная ситуация для большинства городов: уровень правонарушений тесно зависит от концентрации людей и активности пространства. Для повышения безопасности в “красных” зонах необходим комплекс мер: развитие городской среды, освещение, видеонаблюдение, вовлечение людей в общественную жизнь и развитие инфраструктуры контроля.",
+    crime_heat: "Данная карта визуализирует ключевые зоны риска, где пересечение различных городских процессов создает условия для повышенной криминальной активности. На основе пространственных данных выделяются следующие закономерности: 1. Высокая концентрация правонарушений фиксируется в районах железнодорожных и автовокзалов, а также в зонах интенсивной уличной торговли и рынков, что обусловлено большими транзитными потоками. 2. Карта подсвечивает локации с признаками социальной маргинализации и районы с «плохой репутацией» отдельных домов, что служит обоснованием для оптимизации расположения пунктов полиции и зон их ответственности. 3. Особого наблюдения требуют новые микрорайоны с высокой плотностью населения, а также места расположения увеселительных заведений, являющиеся точками притяжения правонарушений в вечернее время. 4. Зоны концентрации высших и специальных учебных заведений в сочетании с крупными торговыми центрами формируют специфические очаги активности, требующие усиленного контроля гражданской безопасности",
+    commercial: "Данный слой визуализирует плотность и распределение коммерческой инфраструктуры, разделяя городскую территорию на зоны в зависимости от интенсивности бизнес-процессов и доступности услуг для населения: 1. Низкая интенсивность (Окраины и частный сектор): Характеризует территории с рассредоточенным расположением объектов, ориентированных исключительно на базовые нужды жителей. В этих зонах выбор товаров ограничен, а доступ к полноценному сервису требует использования транспорта. 2. Средняя интенсивность (Жилые массивы и магистрали): Типична для спальных районов со средней этажностью, где коммерция формирует устойчивые узлы вдоль главных дорог. Здесь достигается баланс между жилой средой и торговыми функциями, обеспечивающий повседневный и периодический спрос в пределах пешей доступности. 3. Высокая интенсивность (Деловые и транспортные узлы): Охватывает исторический центр города и зоны влияния крупных транспортных хабов. Это территории с максимальной концентрацией разнообразных коммерческих объектов и пиковой проходимостью, формирующие основной экономический каркас города.",
+    real_estate: "Недвижимость с высокой стоимостью сконцентрирована преимущественно в центре города и в районах новой застройки.",
+    schools: "В основном нехватка объектов связана с интенсивным строительством жилья в новых районах, где жилые функции появляются раньше, чем успевает развиться социальная и коммерческая инфраструктура. В результате новые кварталы заселяются, а социальные объекты строятся с заметным опозданием.",
+    detsad: "В основном нехватка объектов связана с интенсивным строительством жилья в новых районах, где жилые функции появляются раньше, чем успевает развиться социальная и коммерческая инфраструктура. В результате новые кварталы заселяются, а социальные объекты строятся с заметным опозданием.",
+    medical: "В основном нехватка объектов связана с интенсивным строительством жилья в новых районах, где жилые функции появляются раньше, чем успевает развиться социальная и коммерческая инфраструктура. В результате новые кварталы заселяются, а социальные объекты строятся с заметным опозданием.",
+    college: "В основном нехватка объектов связана с интенсивным строительством жилья в новых районах, где жилые функции появляются раньше, чем успевает развиться социальная и коммерческая инфраструктура. В результате новые кварталы заселяются, а социальные объекты строятся с заметным опозданием.",
+    vuz: "В основном нехватка объектов связана с интенсивным строительством жилья в новых районах, где жилые функции появляются раньше, чем успевает развиться социальная и коммерческая инфраструктура. В результате новые кварталы заселяются, а социальные объекты строятся с заметным опозданием.",
+rm: `
+<div style="display: flex; gap: 15px; font-size: 11px; line-height: 1.4; margin-top: 5px;">
+    <div style="flex: 1;">
+        <div style="color: #2563eb; font-weight: 800; text-transform: uppercase; font-size: 9px; margin-bottom: 8px; border-bottom: 1px solid #dbeafe; padding-bottom: 4px;">
+            Реновация (ИЖС → МЖК)
+        </div>
+        <div style="margin-bottom: 8px;">
+            <b>У центра:</b> 92,9 Га.<br>
+            <i style="color: #64748b;">Разработано ПДП.</i>
+        </div>
+        <div style="margin-bottom: 8px;">
+            <b>Доуплотнение центра:</b> 253,5 Га.<br>
+            <span style="color: #64748b;">(90 Га — ИЖС). Частично ПДП.</span>
+        </div>
+        <div style="margin-bottom: 8px;">
+            <b>Вокзал — Назарбаева:</b> 36,4 Га.<br>
+            <i style="color: #64748b;">Разработано ПДП.</i>
+        </div>
+        <div style="margin-bottom: 8px;">
+            <b>Центр — Южные мкр:</b> 114,3 Га.<br>
+            <i style="color: #64748b;">Разработано ПДП.</i>
+        </div>
+    </div>
+
+    <div style="border-left: 1px solid #f1f5f9; padding-left: 12px; flex: 1;">
+        <div style="color: #059669; font-weight: 800; text-transform: uppercase; font-size: 9px; margin-bottom: 8px; border-bottom: 1px solid #dcfce7; padding-bottom: 4px;">
+            Модернизация среды
+        </div>
+        <div style="margin-bottom: 8px;">
+            <b>Обновление центра:</b> 300,6 Га.<br>
+            <i style="color: #64748b;">Разработано ПДП.</i>
+        </div>
+        <div style="margin-bottom: 8px;">
+            <b>Привокзальная:</b> 148,5 Га.<br>
+            <i style="color: #64748b;">Разработано ПДП.</i>
+        </div>
+        <div style="margin-bottom: 8px;">
+            <b>С-В (у Промзоны):</b> 37,9 Га.
+        </div>
+        <div style="margin-bottom: 8px;">
+            <b>С-В микрорайоны:</b> 161 Га.<br>
+            <i style="color: #64748b;">Разработано ПДП.</i>
+        </div>
+    </div>
+</div>
+`
+};
+
+// --- Алиасы полей (Переименование) ---
+const fieldAliases = {
+    'level': 'Этажность', 
+    'tsn_ru': 'Целевое назначение', 
+    'pricepersqm_avg': 'Цена за м²', 
+    'year': 'Год постройки',
+    'год ввода в эксплуатацию': 'Год постройки',
+    'status': 'Тип', // Переименовано по запросу
+    'mkrn_name': 'Район',
+    'density_popul': 'Плотность (чел/га)', 
+    'density_gsi': 'GSI',
+    'density_rds': 'УДС (км/км²)', 
+    'crime_density': 'Инцидентов/га',
+    'purpose': 'Назначение',
+    'area': 'Площадь',
+    'name': 'Название',
+    'type': 'Тип',
+    'kad_nomer': 'Кадастровый номер',
+    'land_category': 'Категория земель',
+    'sobstvennik': 'Наименование',
+    'Adress': 'Адрес',
+    'area_preza': 'Площадь'
+};
+
+// --- Canvas Renderer ---
+const myRenderer = L.canvas({ padding: 0.5 });
+
+// --- Инициализация карты и слоев подложки ---
+const map = L.map('map', { center: [53.214, 63.632], zoom: 12, zoomControl: false, preferCanvas: true });
+
+// Создаем отдельные pane (слои отрисовки) для порядка наложения
+map.createPane('polygonsPane');
+map.getPane('polygonsPane').style.zIndex = 400; // Низкий z-index
+
+map.createPane('markerPane'); // Стандартный для маркеров
+map.getPane('markerPane').style.zIndex = 600; // Поверх полигонов
+
+const cartoLight = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© CARTO', maxZoom: 19
+});
+
+const googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+    maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], attribution: '© Google'
+});
+
+// Слой по умолчанию
+cartoLight.addTo(map);
+L.control.zoom({ position: 'topright' }).addTo(map);
+
+// Логика переключения подложек
+function setBasemap(type) {
+    if (type === 'scheme') {
+        map.removeLayer(googleSat);
+        map.addLayer(cartoLight);
+        document.getElementById('btn-scheme').classList.add('active');
+        document.getElementById('btn-sat').classList.remove('active');
+    } else {
+        map.removeLayer(cartoLight);
+        map.addLayer(googleSat);
+        document.getElementById('btn-sat').classList.add('active');
+        document.getElementById('btn-scheme').classList.remove('active');
+    }
+}
+
+// --- Конфигурация ---
+const config = {
+    level: { 
+        field: 'level', title: 'Этажность зданий', 
+        breaks: [2, 5, 9, 19], 
+        colors: ['#fce7f3', '#f472b6', '#db2777', '#831843'], 
+        labels: ['1-2', '3-5', '6-9', '10+'] 
+    },
+    year: { 
+        field: 'год ввода в эксплуатацию', title: 'Год постройки', 
+        breaks: [1960, 1975, 1990, 2005, 2015, 2025],
+        colors: ['#d1d5db', '#9ca3af', '#6b7280', '#fb923c', '#f97316', '#ea580c'],
+        labels: ['<1960', '60-75', '75-90', '90-05', '05-15', '>2015']
+    },
+    real_estate: {
+        field: 'pricepersqm_avg', title: 'Стоимость недвижимости за кв. м',
+        breaks: [230000, 320000, 390000, 440000, 530000, 633000], 
+        colors: ['#ffffcc', '#c7e9b4', '#7fcdbb', '#41b6c4', '#2c7fb8', '#253494'], 
+        labels: ['<230k', '230-320', '320-390', '390-440', '440-530', '>530k']
+    },
+    cadastre: {
+        field: 'objectid', title: 'Земельные участки',
+        colors: ['#3b82f6'], labels: ['Границы участков']
+    },
+    rm: {
+        field: 'type', title: 'Реновация и модернизация',
+        colors: ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'], 
+        labels: ['Тип 1', 'Тип 2', 'Тип 3', 'Тип 4', 'Тип 5']
+    },
+    schools: { title: 'Школы (500м)', color: '#2563eb' },
+    detsad: { title: 'Детсады (300м)', color: '#f97316' },
+    medical: { title: 'Медицина', color: '#e11d48' },
+    college: { title: 'Колледжи', color: '#4f46e5' },
+    vuz: { title: 'ВУЗы', color: '#7e22ce' },
+
+    density_popul: { 
+        field: 'density_popul', title: 'Плотность населения', 
+        breaks: [20, 60, 150, 300, 580], 
+        colors: ['#f0f9ff', '#bae6fd', '#38bdf8', '#0284c7', '#0c4a6e'],
+        labels: ['<20', '20-60', '60-150', '150-300', '>300'] 
+    },
+    density_gsi: { 
+        field: 'density_gsi', title: 'Плотность застройки', 
+        breaks: [0.05, 0.15, 0.3, 0.5, 0.8], 
+        colors: ['#f0fdf4', '#bbf7d0', '#4ade80', '#16a34a', '#14532d'],
+        labels: ['<0.05', '0.05-0.15', '0.15-0.3', '0.3-0.5', '>0.5'] 
+    },
+    density_rds: { 
+        field: 'density_rds', title: 'Плотность УДС', 
+        breaks: [10, 25, 45, 65, 82], 
+        colors: ['#fafaf9', '#e7e5e4', '#a8a29e', '#57534e', '#292524'],
+        labels: ['<10', '10-25', '25-45', '45-65', '>65'] 
+    },
+    crime_density: { 
+        field: 'crime_density', title: 'Плотность правонарушений', 
+        breaks: [2, 8, 18, 26.5], 
+        colors: ['#fff1f2', '#fda4af', '#e11d48', '#881337'],
+        labels: ['<2', '2-8', '8-18', '>18'] 
+    },
+    crime_heat: {
+        title: 'Тепловая карта преступлений', subtitle: 'Концентрация инцидентов',
+        gradient: { 0.2: '#0d0887', 0.4: '#7e03a8', 0.6: '#cc4778', 0.8: '#f89540', 1.0: '#f0f921' }
+    },
+    transport: { title: 'Общественный транспорт', subtitle: 'Маршруты и остановки' },
+    commercial: { 
+        title: 'Коммерческая активность', subtitle: 'Концентрация объектов', 
+        gradient: { 0.4: '#d8b4fe', 0.7: '#a855f7', 1.0: '#581c87' } 
+    }
+};
+
+let districtsLayer, buildsLayer, heatLayer, crimeHeatLayer, crimeHotspotsLayer, cadplotsLayer, busRoutesLayer, busStopsLayer, socialLayer, rmLayer;
+let currentMetric = 'cadastre';
+let currentType = 'cadastre'; 
+let highlightedLayer = null;
+let allRouteNames = [];
+let myChart = null;
+let slider = null;
+let currentRange = [0, 10];
+
+const rmTypeColors = {};
+const rmPalette = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#6366f1'];
+
+// --- Аккордеон ---
+const details = document.querySelectorAll("details");
+details.forEach((targetDetail) => {
+    targetDetail.addEventListener("click", () => {
+        details.forEach((detail) => {
+            if (detail !== targetDetail) detail.removeAttribute("open");
+        });
+    });
+});
+
+// --- Функции стиля ---
+function getCategoryIndex(val, metric) {
+    if (val == null) return -1;
+    if (metric === 'cadastre') return 0;
+    
+    let num = NaN;
+    const strVal = String(val);
+    if (metric === 'year') {
+        const match = strVal.match(/(\d{4})/);
+        if (match) num = parseInt(match[0]);
+    }
+    if (isNaN(num)) num = parseFloat(strVal.replace(/[^\d.]/g, ''));
+    if (isNaN(num)) return -1;
+
+    const conf = config[metric];
+    if (!conf.breaks) return 0;
+    for (let i = 0; i < conf.breaks.length; i++) {
+        if (num <= conf.breaks[i]) return i;
+    }
+    return conf.colors.length - 1; 
+}
+
+function getRmColor(type) {
+    if (!type) return '#999';
+    if (!rmTypeColors[type]) {
+        const keys = Object.keys(rmTypeColors);
+        rmTypeColors[type] = rmPalette[keys.length % rmPalette.length];
+    }
+    return rmTypeColors[type];
+}
+
+function style(feature) {
+    if (currentMetric === 'cadastre') return { color: '#3b82f6', weight: 0.5, fillOpacity: 0.2, fillColor: '#3b82f6', interactive: true };
+    
+    if (currentMetric === 'rm') {
+        const type = feature.properties.type || 'Неизвестно';
+        return {
+             fillColor: getRmColor(type),
+             weight: 1,
+             opacity: 1,
+             color: '#fff',
+             fillOpacity: 0.7,
+             interactive: true
+        };
+    }
+
+    const conf = config[currentMetric];
+    if (!conf) return {};
+
+    const val = feature.properties[conf.field];
+    const catIndex = getCategoryIndex(val, currentMetric);
+    
+    const isVisible = (catIndex >= currentRange[0] && catIndex <= currentRange[1]) || catIndex === -1; 
+    
+    if (catIndex === -1) {
+        return { fillColor: '#f1f5f9', weight: 0, opacity: 0, color: 'transparent', fillOpacity: 0.2, interactive: true };
+    }
+
+    const color = conf.colors[catIndex];
+    const strokeWidth = (currentType === 'builds') ? 0.2 : 0.8;
+
+    return { 
+        fillColor: color, 
+        weight: strokeWidth, 
+        opacity: isVisible ? 1 : 0.1, 
+        color: '#64748b', 
+        fillOpacity: isVisible ? 0.9 : 0.1,
+        interactive: true
+    };
+}
+
+function updateLayerStyle() {
+    const layerMap = { 'districts': districtsLayer, 'builds': buildsLayer, 'cadastre': cadplotsLayer, 'rm': rmLayer };
+    const layer = layerMap[currentType];
+    if (layer) layer.eachLayer(l => l.setStyle(style(l.feature)));
+}
+
+// --- Попапы и клики ---
+function onEachFeature(feature, layer) {
+    const props = feature.properties;
+    
+    if (currentType === 'social' && feature.geometry.type === 'Polygon') return; 
+    if (currentType === 'transport' && feature.geometry.type === 'LineString') return;
+
+    layer.on({
+        click: (e) => {
+            // Исправление бага с "залипанием": проверяем, привязан ли слой к карте
+            if (highlightedLayer && map.hasLayer(highlightedLayer) && highlightedLayer.setStyle && currentType !== 'social') {
+                try {
+                    // Возвращаем стиль
+                    highlightedLayer.setStyle(style(highlightedLayer.feature));
+                } catch(err) {
+                    console.log('Layer cleanup error', err);
+                }
+            }
+            
+            highlightedLayer = e.target;
+            
+            if (highlightedLayer.setStyle) {
+                highlightedLayer.setStyle({ weight: 3, color: '#000', fillOpacity: 1 });
+                // Соц объекты и так сверху через pane, остальные поднимаем
+                if (!L.Browser.ie && currentType !== 'social' && highlightedLayer.bringToFront) {
+                     highlightedLayer.bringToFront();
+                }
+            }
+        }
+    });
+
+    // --- Логика Заголовка ---
+    let title = 'Объект';
+    // 1. Для зданий: Приоритет адресу
+    if (props['Адрес жилого дома']) title = props['Адрес жилого дома'];
+    else if (props['Адрес жилого дома_max_max']) title = props['Адрес жилого дома_max_max'];
+    // 2. Для соц объектов: Приоритет Наименованию (Собственник)
+    else if (props['sobstvennik']) title = props['sobstvennik'];
+    else if (props['name']) title = props['name'];
+    else if (props['mkrn_name']) title = props['mkrn_name'];
+
+    let rows = '';
+
+    if (feature.geometry.type === 'Point' && props.type) {
+         rows += `<tr><td class="popup-key">Тип:</td><td class="popup-val">${props.type}</td></tr>`;
+    } 
+    else if (currentType === 'transport' && props.routes_sum) {
+        title = props.name;
+        rows += `<tr><td class="popup-key">Маршрутов:</td><td class="popup-val">${props.routes_sum}</td></tr>`;
+    }
+    else {
+        // Исключаем лишние поля
+        const exclude = ['gid', 'objectid', 'id', 'Адрес жилого дома', 'Адрес жилого дома_max_max', 'sobstvennik', 'name'];
+        for (const [key, value] of Object.entries(props)) {
+            if (value == null || exclude.includes(key)) continue;
+            
+            let alias = fieldAliases[key] || key;
+            if (!fieldAliases[key]) alias = alias.replace('_max_max', '');
+            
+            rows += `<tr><td class="popup-key">${alias}:</td><td class="popup-val">${value}</td></tr>`;
+        }
+    }
+    
+    // Формируем HTML
+    const content = `
+        <div class="popup-header">${title}</div>
+        <div class="popup-body">
+            <table class="popup-table">${rows}</table>
+        </div>
+    `;
+    
+    layer.bindPopup(content);
+}
+
+// --- Легенда ---
+function updateLegend() {
+    const legend = document.getElementById('legend');
+    const conf = config[currentMetric];
+    
+    if (currentType.includes('heat') || currentType === 'transport' || currentType === 'cadastre' || currentType === 'social' || currentType === 'rm') {
+        if(slider) { slider.destroy(); slider = null; }
+        
+        let content = `<div class="legend-title">${conf.title}</div><div style="font-size:11px;margin-bottom:8px;color:#666">${conf.subtitle || ''}</div>`;
+        
+        if (conf.gradient) {
+             const grad = `linear-gradient(to right, ${Object.values(conf.gradient).join(', ')})`;
+             content += `<div style="background:${grad};height:12px;border-radius:6px;width:100%;"></div><div class="legend-labels"><span>Мин.</span><span>Макс.</span></div>`;
+        } 
+        else if (currentType === 'transport') {
+             content += `<div class="legend-item"><div style="width:12px;height:12px;border-radius:50%;background:#94a3b8;border:1px solid #475569;opacity:0.6"></div> Остановка</div>`;
+             content += `<div class="legend-item"><div style="width:20px;height:4px;background:#3b82f6;"></div> Маршрут</div>`;
+        } 
+        else if (currentType === 'cadastre') {
+             content += `<div class="legend-item"><div class="legend-color" style="background:#3b82f6"></div> Границы участков</div>`;
+        }
+        else if (currentType === 'rm') {
+             Object.keys(rmTypeColors).forEach(type => {
+                 content += `<div class="legend-item"><div class="legend-color" style="background:${rmTypeColors[type]}"></div> ${type}</div>`;
+             });
+             if (Object.keys(rmTypeColors).length === 0) content += `<div style="color:#777;font-size:11px">Нажмите на карту для загрузки типов</div>`;
+        }
+        else if (currentType === 'social') {
+             content += `<div class="legend-item"><div style="width:10px;height:10px;border-radius:50%;background:${conf.color};"></div> Объект</div>`;
+             if(currentMetric === 'schools') content += `<div class="legend-item"><div style="width:14px;height:14px;border-radius:50%;background:rgba(37,99,235,0.2);border:1px dashed #2563eb"></div> Зона 500м</div>`;
+             if(currentMetric === 'detsad') content += `<div class="legend-item"><div style="width:14px;height:14px;border-radius:50%;background:rgba(249,115,22,0.2);border:1px dashed #f97316"></div> Зона 300м</div>`;
+        }
+        legend.innerHTML = content;
+        return;
+    }
+
+    const steps = conf.colors.length;
+    currentRange = [0, steps - 1];
+    
+    let html = `<div class="legend-title">${conf.title}</div>`;
+    html += `<div id="slider-container"></div>`;
+    html += `<div class="legend-labels" id="slider-values"></div>`;
+    html += `<div style="display:flex; height:8px; margin-top:5px; border-radius:4px; overflow:hidden">`;
+    conf.colors.forEach(c => { html += `<div style="flex:1; background:${c}"></div>`; });
+    html += `</div>`;
+
+    legend.innerHTML = html;
+
+    const sliderDOM = document.getElementById('slider-container');
+    noUiSlider.create(sliderDOM, {
+        start: [0, steps - 1],
+        connect: true,
+        step: 1,
+        range: { 'min': 0, 'max': steps - 1 }
+    });
+    
+    slider = sliderDOM.noUiSlider;
+    const valDiv = document.getElementById('slider-values');
+    
+    slider.on('update', function (values) {
+        const i1 = Math.round(values[0]);
+        const i2 = Math.round(values[1]);
+        currentRange = [i1, i2];
+        const l1 = conf.labels[i1] || conf.breaks[i1];
+        const l2 = conf.labels[i2] || conf.breaks[i2];
+        valDiv.innerHTML = `<span>${l1}</span><span>${l2}</span>`;
+        updateLayerStyle();
+    });
+}
+
+// Функция сворачивания/разворачивания
+function toggleDescription() {
+    const text = document.getElementById('descText');
+    const btn = document.getElementById('descToggleBtn');
+    if (text.style.display === 'none' || text.style.display === '') {
+        text.style.display = 'block';
+        btn.classList.add('active');
+        btn.innerText = '▲';
+    } else {
+        text.style.display = 'none';
+        btn.classList.remove('active');
+        btn.innerText = '▼';
+    }
+}
+
+// Обновление панели (вставьте внутрь существующей функции updateInfoPanel)
+function updateInfoPanel() {
+    const panel = document.getElementById('descPanel');
+    const text = document.getElementById('descText');
+    const btn = document.getElementById('descToggleBtn');
+
+    panel.style.display = 'block';
+    text.style.display = 'none'; // Всегда скрываем текст при смене метрики
+    btn.classList.remove('active');
+    btn.innerText = '▼';
+
+    document.getElementById('descTitle').innerText = config[currentMetric].title;
+    document.getElementById('descText').innerHTML = descriptions[currentMetric] || "Описание отсутствует";
+
+    const chartPanel = document.getElementById('chartPanel');
+    const ctx = document.getElementById('infoChart');
+    
+    let chartData = null;
+    let title = "";
+
+    if (currentMetric === 'cadastre') {
+        chartData = chartDataSources.land;
+        title = "Земельный фонд (га)";
+    } else if (currentMetric === 'crime_heat') {
+        chartData = chartDataSources.crime;
+        title = "Топ преступлений";
+    }
+
+    if (chartData) {
+        chartPanel.style.display = 'block';
+        document.getElementById('chartTitle').innerText = title;
+        if (myChart) myChart.destroy();
+        myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    data: chartData.values,
+                    backgroundColor: chartData.colors,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 10, font: { size: 9 } } }
+                }
+            }
+        });
+    } else {
+        chartPanel.style.display = 'none';
+    }
+}
+
+// --- Создание слоя соц. объектов (Специальный pane) ---
+function createSocialLayer(geojson, type) {
+    if (!socialLayer) socialLayer = L.layerGroup();
+    socialLayer.clearLayers();
+    
+    const conf = config[type];
+    const color = conf.color;
+    const radius = (type === 'schools') ? 500 : (type === 'detsad' ? 300 : 0);
+    
+    geojson.features.forEach(f => {
+        const latlng = [f.geometry.coordinates[1], f.geometry.coordinates[0]];
+        
+        // Зона (радиус)
+        if (radius > 0) {
+            L.circle(latlng, {
+                radius: radius,
+                color: color, fillColor: color, fillOpacity: 0.1,
+                weight: 1, dashArray: '5, 5', interactive: false
+            }).addTo(socialLayer);
+        }
+        
+        // Точка (Маркер) - используем markerPane для кликабельности
+        L.circleMarker(latlng, {
+            radius: 7,
+            color: '#fff',
+            fillColor: color,
+            fillOpacity: 1,
+            weight: 2,
+            pane: 'markerPane' // Важно: всегда сверху
+        }).addTo(socialLayer).bindPopup(() => {
+            // Генерация popup "на лету"
+            const p = f.properties;
+            const name = p.sobstvennik || p.name || 'Объект';
+            const addr = p.Adress || p.address || '-';
+            
+            // HTML попапа
+            return `
+                <div class="popup-header" style="background:${color}">${name}</div>
+                <div class="popup-body" style="padding:10px 15px;">
+                    <div style="font-size:12px;color:#888;margin-bottom:4px">Адрес</div>
+                    <div style="font-weight:600;font-size:14px">${addr}</div>
+                </div>`;
+        });
+    });
+}
+
+// --- Загрузка ---
+Promise.all([
+    fetch('kostanay_districts.geojson').then(r=>r.json()),
+    fetch('kostanay_builds.geojson').then(r=>r.json()),
+    fetch('kostanay_poi.geojson').then(r=>r.json()),
+    fetch('kostanay_bus_routes.geojson').then(r=>r.json()),
+    fetch('kostanay_bus_stops.geojson').then(r=>r.json()),
+    fetch('kostanay_cadplots.geojson').then(r=>r.json()),
+    fetch('kostanay_crime.geojson').then(r=>r.json()),
+    fetch('kostanay_crime_hotspots.geojson').then(r=>r.json()),
+    fetch('kostanay_schools.geojson').then(r=>r.json()),
+    fetch('kostanay_detsad.geojson').then(r=>r.json()),
+    fetch('kostanay_medical.geojson').then(r=>r.json()),
+    fetch('kostanay_college.geojson').then(r=>r.json()),
+    fetch('kostanay_vuz.geojson').then(r=>r.json()),
+    fetch('kostanay_rm.geojson').then(r=>r.json())
+]).then(([districts, builds, poi, routes, stops, cadplots, crime, hotspots, schools, detsad, medical, college, vuz, rm]) => {
+
+    districtsLayer = L.geoJSON(districts, { style: style, onEachFeature: onEachFeature, renderer: myRenderer, pane: 'polygonsPane' });
+    buildsLayer = L.geoJSON(builds, { style: style, onEachFeature: onEachFeature, renderer: myRenderer, pane: 'polygonsPane' });
+    cadplotsLayer = L.geoJSON(cadplots, { style: style, onEachFeature: onEachFeature, renderer: myRenderer, pane: 'polygonsPane' });
+    rmLayer = L.geoJSON(rm, { style: style, onEachFeature: onEachFeature, renderer: myRenderer, pane: 'polygonsPane' });
+
+    // Инициализация цветов реновации
+    rm.features.forEach(f => { if(f.properties.type) getRmColor(f.properties.type); });
+
+    window.socialData = { schools, detsad, medical, college, vuz };
+
+    const heatPoints = poi.features.map(f => [f.geometry.coordinates[1], f.geometry.coordinates[0], 0.3]);
+    heatLayer = L.heatLayer(heatPoints, { radius: 15, blur: 18, gradient: config.commercial.gradient });
+
+    const crimePoints = crime.features.map(f => [f.geometry.coordinates[1], f.geometry.coordinates[0], 0.5]);
+    crimeHeatLayer = L.heatLayer(crimePoints, { radius: 20, blur: 15, gradient: config.crime_heat.gradient });
+    
+    crimeHotspotsLayer = L.geoJSON(hotspots, {
+        pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 5, color: '#fff', fillColor: '#b91c1c', fillOpacity: 1, weight: 1, pane: 'markerPane' }),
+        onEachFeature: onEachFeature
+    });
+
+    busRoutesLayer = L.geoJSON(routes, { style: { color: '#3b82f6', weight: 4, opacity: 0.2 }, onEachFeature: onEachFeature, pane: 'polygonsPane' });
+    
+    busStopsLayer = L.geoJSON(stops, {
+        pointToLayer: (f, latlng) => {
+             const r = 2 + (f.properties.routes_sum || 0)/4; 
+             return L.circleMarker(latlng, { radius: Math.min(r, 8), color: '#475569', fillColor: '#94a3b8', fillOpacity: 0.8, weight: 1, pane: 'markerPane' });
+        },
+        onEachFeature: onEachFeature
+    });
+    
+    const routesSet = new Set();
+    routes.features.forEach(f => { if(f.properties.name) routesSet.add(f.properties.name.toString()); });
+    allRouteNames = Array.from(routesSet).sort((a,b)=> a.localeCompare(b, undefined, {numeric:true}));
+    const rp = document.getElementById('routes-panel');
+    allRouteNames.forEach(n => {
+        const b = document.createElement('button');
+        b.className = 'route-select-btn'; b.innerText = n;
+        b.onclick = () => {
+            busRoutesLayer.eachLayer(l => {
+                if(l.feature.properties.name == n) { l.setStyle({color:'#ea580c', weight:6, opacity:1}); l.bringToFront(); }
+                else l.setStyle({color:'#3b82f6', weight:4, opacity:0.1});
+            });
+            document.querySelectorAll('.route-select-btn').forEach(btn=>btn.classList.remove('active'));
+            b.classList.add('active');
+        };
+        rp.appendChild(b);
+    });
+
+    switchMode('cadastre', 'cadastre');
+
+}).catch(e => console.error("Ошибка загрузки данных:", e));
+
+// --- Переключение режимов ---
+function switchMode(metric, type) {
+    // 1. Сброс подсветки (Фикс бага с залипанием)
+    highlightedLayer = null;
+    map.closePopup();
+
+    currentMetric = metric;
+    currentType = type;
+
+    // 2. Удаление всех слоев
+    [districtsLayer, buildsLayer, heatLayer, crimeHeatLayer, crimeHotspotsLayer, cadplotsLayer, busRoutesLayer, busStopsLayer, socialLayer, rmLayer].forEach(l => {
+        if(l && map.hasLayer(l)) map.removeLayer(l);
+    });
+
+    // 3. Добавление нужных
+    if (type === 'districts') { updateLayerStyle(); map.addLayer(districtsLayer); }
+    else if (type === 'builds') { updateLayerStyle(); map.addLayer(buildsLayer); }
+    else if (type === 'cadastre') { updateLayerStyle(); map.addLayer(cadplotsLayer); }
+    else if (type === 'rm') { updateLayerStyle(); map.addLayer(rmLayer); }
+    else if (type === 'heat') { map.addLayer(heatLayer); }
+    
+    else if (type === 'heat_crime') { 
+        map.addLayer(crimeHeatLayer); 
+        map.addLayer(crimeHotspotsLayer); 
+    }
+    
+    else if (type === 'transport') { 
+        map.addLayer(busRoutesLayer); map.addLayer(busStopsLayer); 
+        document.getElementById('routes-panel').style.display = 'flex';
+    } 
+    else if (type === 'social') {
+        createSocialLayer(window.socialData[metric], metric);
+        map.addLayer(socialLayer);
+    }
+
+    if (type !== 'transport') document.getElementById('routes-panel').style.display = 'none';
+
+    updateLegend();
+    updateInfoPanel();
+}
+
+document.querySelectorAll('.metric-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.metric-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        switchMode(e.target.dataset.metric, e.target.dataset.type);
+    });
+});
+</script>
+</body>
+</html>

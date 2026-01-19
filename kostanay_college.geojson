@@ -1,0 +1,20 @@
+{
+"type": "FeatureCollection",
+"name": "kostanay_college",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Adress": "ул. Герцена 68", "sobstvennik": "Профессиональный лицей № 17" }, "geometry": { "type": "Point", "coordinates": [ 63.649243061065881, 53.222164614392142 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Маяковского д. 101", "sobstvennik": "Профессиональный лицей №3" }, "geometry": { "type": "Point", "coordinates": [ 63.615111814940249, 53.18341934272042 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Чернышевского д. 59", "sobstvennik": "КИНЭУ" }, "geometry": { "type": "Point", "coordinates": [ 63.597037134635869, 53.202135137739667 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Быковского д. 9", "sobstvennik": "Педагогический колледж" }, "geometry": { "type": "Point", "coordinates": [ 63.609469781138429, 53.182433961831222 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Баймагамбетова д. 1", "sobstvennik": "" }, "geometry": { "type": "Point", "coordinates": [ 63.604628958755235, 53.186768385474743 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Баймагамбетова 4", "sobstvennik": "Костанайский индустриальный колледж" }, "geometry": { "type": "Point", "coordinates": [ 63.60947282124436, 53.190697799924727 ] } },
+{ "type": "Feature", "properties": { "Adress": "просп. Абая, 23", "sobstvennik": "Профлицей Бытового сервиса" }, "geometry": { "type": "Point", "coordinates": [ 63.603380088014454, 53.183342243749131 ] } },
+{ "type": "Feature", "properties": { "Adress": "0", "sobstvennik": "Костанайский социально-технический колледж" }, "geometry": { "type": "Point", "coordinates": [ 63.628835350093972, 53.221888113519277 ] } },
+{ "type": "Feature", "properties": { "Adress": "ул. Баймагамбетова д. 181", "sobstvennik": "Медицинский колледж" }, "geometry": { "type": "Point", "coordinates": [ 63.62563309355793, 53.213621331891538 ] } },
+{ "type": "Feature", "properties": { "Adress": "0", "sobstvennik": "" }, "geometry": { "type": "Point", "coordinates": [ 63.66412264220709, 53.235653114384753 ] } },
+{ "type": "Feature", "properties": { "Adress": "0", "sobstvennik": "Костанайский колледж автомоб. транспорта" }, "geometry": { "type": "Point", "coordinates": [ 63.636500754602402, 53.22797144721784 ] } },
+{ "type": "Feature", "properties": { "Adress": "просп. Аль-Фараби д. 109", "sobstvennik": "Гуманитарный колледж" }, "geometry": { "type": "Point", "coordinates": [ 63.61997991833433, 53.218976063189466 ] } },
+{ "type": "Feature", "properties": { "Adress": "просп. Абая д. 28, 32", "sobstvennik": "КГУ имени А. Байтурсынова" }, "geometry": { "type": "Point", "coordinates": [ 63.612256792615526, 53.186661976277747 ] } }
+]
+}

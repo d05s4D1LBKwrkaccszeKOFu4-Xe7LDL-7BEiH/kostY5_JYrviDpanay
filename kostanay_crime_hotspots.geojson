@@ -1,0 +1,29 @@
+{
+"type": "FeatureCollection",
+"name": "kostanay_crime_hotspots",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "name": "Супермаркет \"Солнечный\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.680049346107765, 53.239446045385876 ] } },
+{ "type": "Feature", "properties": { "fid": 2, "name": "Магазин \"DDD\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.687084051172562, 53.240200834636099 ] } },
+{ "type": "Feature", "properties": { "fid": 3, "name": "Дом \"Дурашка\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.670303145078023, 53.237184582263609 ] } },
+{ "type": "Feature", "properties": { "fid": 4, "name": "Столовая и СТО", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.653773561696688, 53.235190050565677 ] } },
+{ "type": "Feature", "properties": { "fid": 5, "name": "Общежитие", "type": "Общежития" }, "geometry": { "type": "Point", "coordinates": [ 63.630989577158338, 53.23020407699363 ] } },
+{ "type": "Feature", "properties": { "fid": 6, "name": "ТРЦ \"Костанай Плаза\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.614173147093616, 53.236763272157155 ] } },
+{ "type": "Feature", "properties": { "fid": 7, "name": "ЖД вокзал г. Костанай", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.606117220364695, 53.227016759087874 ] } },
+{ "type": "Feature", "properties": { "fid": 8, "name": "Общежитие и торговый дом", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.625557247677449, 53.218904024813739 ] } },
+{ "type": "Feature", "properties": { "fid": 9, "name": "Бизнес-центр \"City Kostanai\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.63681378542681, 53.211443247872751 ] } },
+{ "type": "Feature", "properties": { "fid": 10, "name": "Колледж", "type": "Учебное заведение" }, "geometry": { "type": "Point", "coordinates": [ 63.635627042146531, 53.212139728172794 ] } },
+{ "type": "Feature", "properties": { "fid": 11, "name": "ТРЦ \"MART\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.638125155730961, 53.212209144954919 ] } },
+{ "type": "Feature", "properties": { "fid": 12, "name": "Бар, сауна, гостиница \"Волна\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.634261361348344, 53.203948472097871 ] } },
+{ "type": "Feature", "properties": { "fid": 13, "name": "Наримановский рынок, кафе \"Шахерезада\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.628632930112936, 53.201247375476129 ] } },
+{ "type": "Feature", "properties": { "fid": 14, "name": "Торговый центр \"БУМ\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.624625505413526, 53.201196786398803 ] } },
+{ "type": "Feature", "properties": { "fid": 15, "name": "Район \"Жана Кала\"", "type": "Район" }, "geometry": { "type": "Point", "coordinates": [ 63.623893030318499, 53.203711191727756 ] } },
+{ "type": "Feature", "properties": { "fid": 16, "name": "ТЦ \"Емшан\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.61335738505808, 53.191434149627952 ] } },
+{ "type": "Feature", "properties": { "fid": 17, "name": "Колледж сферы обслуживания", "type": "Учебное заведение" }, "geometry": { "type": "Point", "coordinates": [ 63.603251347765877, 53.183654529359366 ] } },
+{ "type": "Feature", "properties": { "fid": 18, "name": "1 мкрн", "type": "Район" }, "geometry": { "type": "Point", "coordinates": [ 63.603809645691641, 53.175443946749432 ] } },
+{ "type": "Feature", "properties": { "fid": 19, "name": "Автовокзал", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.592974343385919, 53.170845010937491 ] } },
+{ "type": "Feature", "properties": { "fid": 20, "name": "Общежитие", "type": "Общежития" }, "geometry": { "type": "Point", "coordinates": [ 63.612124516612994, 53.18894298497289 ] } },
+{ "type": "Feature", "properties": { "fid": 21, "name": "Рынок \"Нижняя оптовка\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.641715599922684, 53.218758580935798 ] } },
+{ "type": "Feature", "properties": { "fid": 22, "name": "ТД \"Победа\"", "type": "Места скопления людей" }, "geometry": { "type": "Point", "coordinates": [ 63.644973067333929, 53.217667859825163 ] } }
+]
+}
