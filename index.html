@@ -36,34 +36,57 @@
     .basemap-btn:hover { background: #f1f5f9; color: #333; }
     .basemap-btn.active { background: #eff6ff; color: #2563eb; font-weight: 700; box-shadow: inset 0 0 0 1px #bfdbfe; }
 
-    /* --- Рубрикатор слева --- */
-    .metrics-control-left{
-        position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.98);
-        padding:15px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12);
-        z-index:1000; display:flex;flex-direction:column; gap:8px; width:250px;
-        backdrop-filter: blur(10px); max-height: 85vh; overflow-y: auto;
-    }
-    
-    details { margin-bottom: 0; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
-    details:last-child { border-bottom: none; }
-    summary { 
-        font-size: 10px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;
-        cursor: pointer; padding: 8px 0; list-style: none; display: flex; justify-content: space-between; align-items: center;
-    }
-    summary::-webkit-details-marker { display: none; }
-    summary::after { content: '+'; font-size: 16px; color: #94a3b8; font-weight: 400; }
-    details[open] summary::after { content: '−'; }
+/* Адаптированные стили аккордеона из style.css */
 
-    .metrics-group { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; padding-left: 5px;}
+.metrics-control-left {
+    position: absolute; top: 20px; left: 20px;  /* Сохранили из вашего HTML */
+    width: 250px; /* Сохранили вашу ширину, вместо 320px из css */
+    max-height: calc(100vh - 280px);  /* Из css, адаптировали под ваш max-height */
+    display: flex; flex-direction: column; z-index: 1000; /* Сохранили ваш z-index */
+    background: rgba(255, 255, 255, 0.98); /* Сохранили ваш фон */
+    border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); /* Сохранили ваши стили */
+    overflow-y: auto; overflow-x: hidden; /* Из css */
+    padding: 0; /* Из css */
+    backdrop-filter: blur(10px); /* Сохранили ваш */
+}
 
-    .metrics-control-left button.metric-btn{
-        padding:6px 10px; background:transparent; border:1px solid transparent; border-radius:6px;
-        cursor:pointer; font-size:11px; text-align:left; transition:all .2s; width: 100%; color: #475569;
-    }
-    .metrics-control-left button.metric-btn:hover{ background:#f8fafc; color: #0f172a; }
-    .metrics-control-left button.metric-btn.active{
-        background:#eff6ff; color:#2563eb; border-color:#dbeafe; font-weight: 600;
-    }
+details {  /* Замена .acc-item */
+    border-bottom: 1px solid #eee;  /* Из css */
+}
+
+summary {  /* Замена .acc-header */
+    padding: 12px 15px; cursor: pointer; font-size: 13px; font-weight: 700; color: #2c3e50;  /* Из css */
+    display: flex; justify-content: space-between; align-items: center; transition: background 0.2s;  /* Из css */
+}
+
+summary:hover { background: #f8f9fa; }  /* Из css (замена .acc-header:hover) */
+
+summary::after {  /* Замена .acc-header::after */
+    content: '›'; font-size: 16px; color: #999; transform: rotate(90deg); transition: transform 0.3s;  /* Из css */
+}
+
+details[open] summary::after {  /* Замена .acc-item.active .acc-header::after */
+    transform: rotate(-90deg);  /* Из css */
+}
+
+.metrics-group {  /* Замена .acc-body */
+    display: none; padding: 5px 0; background: #fff;  /* Из css */
+}
+
+details[open] .metrics-group {  /* Замена .acc-item.active .acc-body */
+    display: block;  /* Из css */
+}
+
+/* Кнопки метрик (адаптация .metric-option из css к .metric-btn) */
+.metric-btn {
+    display: flex; align-items: center; width: 100%; text-align: left;  /* Из css */
+    padding: 10px 15px; border: none; background: transparent;  /* Из css */
+    cursor: pointer; font-size: 13px; color: #555; box-sizing: border-box;  /* Из css */
+}
+
+.metric-btn:hover { background: #f0f2f5; }  /* Из css (замена .metric-option:hover) */
+
+.metric-btn.active { background: #e7f5ff; color: #0066cc; font-weight: 600; border-right: 3px solid #0066cc; }  /* Из css */
 
     /* Описание */
     .description-panel {
@@ -100,14 +123,70 @@
 
     /* Панель диаграмм */
     .chart-panel {
-        position: absolute; top: 130px; right: 20px;
+        position: absolute; top: 110px; right: 20px;
         background: white; padding: 15px; border-radius: 12px;
         box-shadow: 0 6px 20px rgba(0,0,0,0.1); z-index: 1000;
         width: 260px; display: none;
         transition: none !important; animation: none !important;
     }
     .chart-panel h4 { margin: 0 0 10px 0; font-size: 13px; color: #333; text-align: center; font-weight: 700;}
-    .chart-container { position: relative; height: 200px; width: 100%; }
+.chart-container { 
+    position: relative; 
+    height: 130px; /* Было 200px — это приподнимет всё, что ниже, выше */
+    width: 100%; 
+}
+
+/* --- Стили для кнопок горячих точек --- */
+#crimeHotspotsPanel {
+    margin-top: 5px; /* Было 15px — уменьшаем до 5px */
+    padding-top: 5px; /* Было 10px — уменьшаем до 5px */
+    border-top: 1px solid #f1f5f9;
+    display: none;
+}
+    
+    .hotspot-buttons-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+
+    .hotspot-btn {
+        flex: 1 1 45%; /* Кнопки занимают ~половину ширины */
+        padding: 6px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748b;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+
+    .hotspot-btn:hover {
+        background: #fee2e2;
+        color: #991b1b;
+        border-color: #fecaca;
+    }
+
+    .hotspot-btn.active {
+        background: #ef4444;
+        color: white;
+        border-color: #b91c1c;
+    }
+
+    #hotspotTextBox {
+        background: #fdf2f8; /* Светло-розовый фон для акцента */
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #fbcfe8;
+        font-size: 12px;
+        color: #831843;
+        line-height: 1.4;
+        min-height: 40px;
+    }
 
     /* Легенда */
     .legend{
@@ -170,11 +249,19 @@
     <div id="descText">Текст описания...</div>
 </div>
 
-<div class="chart-panel" id="chartPanel">
+    <div class="chart-panel" id="chartPanel">
     <h4 id="chartTitle">Статистика</h4>
     <div class="chart-container">
         <canvas id="infoChart"></canvas>
     </div>
+    
+    <div id="crimeHotspotsPanel">
+        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #881337;">Очаги активности:</h4>
+        <div class="hotspot-buttons-container" id="hotspotButtons">
+            </div>
+        <div id="hotspotTextBox">Выберите зону выше для подробной информации.</div>
+    </div>
+</div>
 </div>
 
 <div class="metrics-control-left" id="accordion">
@@ -274,6 +361,35 @@ const chartDataSources = {
     }
 };
 
+// --- Данные для горячих точек преступности ---
+const crimeHotspotsData = [
+    {
+        name: "Каирбекова – Текстильщиков",
+        coords: [53.2394460, 63.6800493], // Lat, Lng
+        text: "Следует расположить пункт полиции в районе с плохой репутацией отдельных жилых домов"
+    },
+    {
+        name: "Центральный рынок",
+        coords: [53.2176678, 63.6449730],
+        text: "Район с активной уличной и внеуличной торговлей часто является местом высокой криминогенности"
+    },
+    {
+        name: "Абая – Наримановская",
+        coords: [53.2012473, 63.6286329],
+        text: "Новый район с высокой плотностью населения и отдельные увеселительные заведения должны находиться под наблюдением"
+    },
+    {
+        name: "Образовательный кластер",
+        coords: [53.1889429, 63.6121245],
+        text: "Места концентрации высших и специальных учебных заведений вкупе с торговыми центрами могут быть источниками криминогенности"
+    },
+    {
+        name: "Автовокзал",
+        coords: [53.1708450, 63.5929743],
+        text: "Железнодорожные и автовокзалы традиционно считаются местом с высоким уровнем преступности"
+    }
+];
+
 // --- Текстовые описания ---
 const descriptions = {
     level: "Большая часть городской территории занята домами 1–5 этажей (светло-розовые  и розовые участки). Высотки (от 12 этажей) — редкость и находятся только в ограниченных зонах, вероятно, вблизи ключевых транспортных узлов или административных центров.",
@@ -284,7 +400,7 @@ const descriptions = {
     density_rds: "Улично-дорожная сеть в целом отражает этапность и специфику развития города: хорошую структуру в центре, достаточно рациональная сетка и новые районы с тенденцией к фрагментации и малой связанности. Ключевые проблемы: 1. Часть старых районов страдает от устаревшей инфраструктуры, которая не соответствует современным транспортным потокам. 2. Новые кварталы часто имеют слабую интеграцию с остальным городом, а транспортная сетка выполнена формально, что снижает связанность городской среды. 3. В промышленной периферии и транзитных зонах УДС становится барьером для пешеходов и городского развития.",
     transport: "Сеть общественного транспорта достаточно развита по основным магистралям и обеспечивает связность между крупными районами города, но слабо обрабатывает внутренние связи и окраины. 1. Жителям многих районов сложно пользоваться ОТ без лишних пересадок. 2. Текущая структура снижает транспортную гибкость и - на перспективу - требует развития локальных маршрутов, улучшения проникновения в глубокие и новые жилые массивы, а также интеграции с другими видами городской мобильности (пешие, велосипедные связи). 3 .Особое внимание стоит уделить развивающимся новым районам и зонам разрывов городской ткани, чтобы не допустить транспортной изоляции отдельных кварталов",
     crime_density: "Криминальная активность в городе наиболее выражена в наиболее насыщенных и транзитных районах - центр, крупные жилые массивы и ключевые транспортные коридоры. Малонаселенные и периферийные зоны остаются относительно спокойными. Это типичная ситуация для большинства городов: уровень правонарушений тесно зависит от концентрации людей и активности пространства. Для повышения безопасности в “красных” зонах необходим комплекс мер: развитие городской среды, освещение, видеонаблюдение, вовлечение людей в общественную жизнь и развитие инфраструктуры контроля.",
-    crime_heat: "Данная карта визуализирует ключевые зоны риска, где пересечение различных городских процессов создает условия для повышенной криминальной активности. На основе пространственных данных выделяются следующие закономерности: 1. Высокая концентрация правонарушений фиксируется в районах железнодорожных и автовокзалов, а также в зонах интенсивной уличной торговли и рынков, что обусловлено большими транзитными потоками. 2. Карта подсвечивает локации с признаками социальной маргинализации и районы с «плохой репутацией» отдельных домов, что служит обоснованием для оптимизации расположения пунктов полиции и зон их ответственности. 3. Особого наблюдения требуют новые микрорайоны с высокой плотностью населения, а также места расположения увеселительных заведений, являющиеся точками притяжения правонарушений в вечернее время. 4. Зоны концентрации высших и специальных учебных заведений в сочетании с крупными торговыми центрами формируют специфические очаги активности, требующие усиленного контроля гражданской безопасности",
+    crime_heat: "В структуре преступности преобладают имущественные правонарушения. На долю краж (ст. 188) приходится 39,2%, на мошенничество – 33,6%, что в совокупности составляет 72,8% от общего числа зарегистрированных деяний. По отдельным составам преступлений, в частности по умышленному причинению вреда здоровью средней тяжести (ст. 107), основная масса фактов (более 400) квалифицирована по части 1, что свидетельствует о преобладании составов без отягчающих обстоятельств.",
     commercial: "Данный слой визуализирует плотность и распределение коммерческой инфраструктуры, разделяя городскую территорию на зоны в зависимости от интенсивности бизнес-процессов и доступности услуг для населения: 1. Низкая интенсивность (Окраины и частный сектор): Характеризует территории с рассредоточенным расположением объектов, ориентированных исключительно на базовые нужды жителей. В этих зонах выбор товаров ограничен, а доступ к полноценному сервису требует использования транспорта. 2. Средняя интенсивность (Жилые массивы и магистрали): Типична для спальных районов со средней этажностью, где коммерция формирует устойчивые узлы вдоль главных дорог. Здесь достигается баланс между жилой средой и торговыми функциями, обеспечивающий повседневный и периодический спрос в пределах пешей доступности. 3. Высокая интенсивность (Деловые и транспортные узлы): Охватывает исторический центр города и зоны влияния крупных транспортных хабов. Это территории с максимальной концентрацией разнообразных коммерческих объектов и пиковой проходимостью, формирующие основной экономический каркас города.",
     real_estate: "Недвижимость с высокой стоимостью сконцентрирована преимущественно в центре города и в районах новой застройки.",
     schools: "В основном нехватка объектов связана с интенсивным строительством жилья в новых районах, где жилые функции появляются раньше, чем успевает развиться социальная и коммерческая инфраструктура. В результате новые кварталы заселяются, а социальные объекты строятся с заметным опозданием.",
@@ -680,6 +796,35 @@ function toggleDescription() {
     }
 }
 
+function renderHotspotButtons() {
+    const container = document.getElementById('hotspotButtons');
+    const textBox = document.getElementById('hotspotTextBox');
+    container.innerHTML = ''; // Очистка
+
+    crimeHotspotsData.forEach((spot, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'hotspot-btn';
+        btn.innerText = spot.name;
+        
+        btn.onclick = () => {
+            // Сброс активного класса у всех
+            document.querySelectorAll('.hotspot-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Перелет камеры (zoom 15 для детального просмотра)
+            map.flyTo(spot.coords, 15, {
+                animate: true,
+                duration: 1.2
+            });
+            
+            // Обновление текста
+            textBox.innerHTML = `<strong>${spot.name}:</strong><br>${spot.text}`;
+        };
+        
+        container.appendChild(btn);
+    });
+}
+
 function updateInfoPanel() {
     const panel = document.getElementById('descPanel');
     const text = document.getElementById('descText');
@@ -690,15 +835,18 @@ function updateInfoPanel() {
     document.getElementById('descText').innerHTML = descriptions[currentMetric] || "Описание отсутствует";
 
     const chartPanel = document.getElementById('chartPanel');
+    const hotspotsPanel = document.getElementById('crimeHotspotsPanel'); // Получаем панель кнопок
     const ctx = document.getElementById('infoChart');
     let chartData = null;
 
     if (currentMetric === 'cadastre') chartData = chartDataSources.land;
     else if (currentMetric === 'crime_heat') chartData = chartDataSources.crime;
 
+    // Логика отображения диаграммы
     if (chartData) {
         chartPanel.style.display = 'block';
-        document.getElementById('chartTitle').innerText = (currentMetric==='cadastre')?"Земельный фонд (га)":"Топ преступлений";
+        document.getElementById('chartTitle').innerText = (currentMetric==='cadastre') ? "Земельный фонд (га)" : "Топ преступлений";
+        
         if (myChart) myChart.destroy();
         myChart = new Chart(ctx, {
             type: 'doughnut',
@@ -706,7 +854,18 @@ function updateInfoPanel() {
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 9 } } } } }
         });
     } else {
+        // Если данных для диаграммы нет, скрываем всю панель, если это не crime_heat
+        // (но для crime_heat у нас есть диаграмма, так что этот блок сработает корректно)
         chartPanel.style.display = 'none';
+    }
+
+    // --- НОВАЯ ЛОГИКА ДЛЯ ПАНЕЛИ ПРЕСТУПЛЕНИЙ ---
+    if (currentMetric === 'crime_heat') {
+        chartPanel.style.display = 'block'; // Принудительно показываем панель
+        hotspotsPanel.style.display = 'block'; // Показываем кнопки
+        renderHotspotButtons(); // Генерируем кнопки (можно вызывать один раз, но здесь безопаснее)
+    } else {
+        hotspotsPanel.style.display = 'none'; // Скрываем кнопки в других режимах
     }
 }
 
