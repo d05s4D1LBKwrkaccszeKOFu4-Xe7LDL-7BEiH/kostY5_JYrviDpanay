@@ -225,16 +225,97 @@ details[open] .metrics-group {  /* Замена .acc-item.active .acc-body */
     
     .leaflet-control-layers { display: none !important; }
 
+/* Контейнер для логотипов и кнопки */
+    .top-right-nav {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: row; /* Сама группа (логотипы + кнопка) в ряд */
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Контейнер чисто для логотипов, чтобы они стояли друг над другом */
+    .logo-stack {
+        display: flex;
+        flex-direction: column; /* Логотипы один под другим */
+        gap: 5px; /* Расстояние между логотипами */
+    }
+
+    .nav-logo-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+    }
+
+    .nav-logo-link:hover {
+        transform: scale(1.1); /* Легкое увеличение при наведении */
+    }
+
+    .nav-logo-img {
+        height: 28px; /* Уменьшенный размер */
+        width: auto;
+        border-radius: 0px;
+        background: white;
+        padding: 2px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        display: block;
+    }
+
+    .external-link-btn {
+        position: static !important;
+        margin: 0;
+        height: fit-content; /* Чтобы кнопка не растягивалась по высоте логотипов */
+    }
+
+    .nav-logo-img {
+        width: auto;
+        border-radius: 4px;
+        background: white;
+        padding: 2px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        display: block;
+    }
+
+    /* Индивидуальные размеры */
+    .logo-khc {
+        height: 26px; /* Размер первого логотипа */
+    }
+
+    .logo-q88 {
+        height: 19px; /* Сделали второй логотип заметно меньше */
+    }
+
+    .logo-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: center; /* Центрируем их друг относительно друга */
+    }
 </style>
 </head>
 <body>
 
 <div id="map"></div>
 
-<a href="https://d05s4d1lbkwrkaccszekofu4-xe7ldl-7beih.github.io/kaz4-g2U1mXCZtrademap/" target="_blank" class="external-link-btn">
-    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"></path></svg>
-    Карта Казахстана
-</a>
+<div class="top-right-nav">
+    <div class="logo-stack">
+        <a href="https://homeportal.kz/" target="_blank" class="nav-logo-link">
+            <img src="khc.png" alt="KHC" class="nav-logo-img logo-khc">
+        </a>
+        <a href="https://q88.kz/" target="_blank" class="nav-logo-link">
+            <img src="q88.png" alt="Q88" class="nav-logo-img logo-q88">
+        </a>
+    </div>
+
+    <a href="https://d05s4d1lbkwrkaccszekofu4-xe7ldl-7beih.github.io/kaz4-g2U1mXCZtrademap/" target="_blank" class="external-link-btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"></path></svg>
+        Карта Казахстана
+    </a>
+</div>
 
 <div class="basemap-switcher">
     <button class="basemap-btn active" id="btn-scheme" onclick="setBasemap('scheme')">Схема</button>
